@@ -8,7 +8,7 @@ Requires:
 - droid-hal-victara-img-boot
 - droid-hal-victara-kernel
 - droid-hal-victara-kernel-modules
-- droid-hal-victara-detirius
+- droid-hal-victara-detritus
 - droid-config-victara-sailfish
 - droid-config-victara-pulseaudio-settings
 - droid-config-victara-policy-settings
