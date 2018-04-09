@@ -14,7 +14,7 @@ Requires:
 - droid-config-victara-policy-settings
 - droid-config-victara-preinit-plugin
 - droid-config-victara-flashing
-- droid-config-victara-bluez4
+- droid-config-victara-bluez5
 - droid-hal-version-victara
 
 # Hybris packages
