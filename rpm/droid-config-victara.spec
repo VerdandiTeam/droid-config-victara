@@ -24,6 +24,8 @@
 %define pixel_ratio 1.6
 
 %include droid-configs-device/droid-configs.inc
+%include patterns/patterns-sailfish-device-adaptation-victara.inc
+%include patterns/patterns-sailfish-device-configuration-victara.inc
 
 # IMPORTANT if you want to comment out any macros in your .spec, delete the %
 # sign, otherwise they will remain defined! E.g.:
