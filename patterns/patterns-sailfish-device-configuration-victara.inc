@@ -24,6 +24,8 @@ Requires: patterns-sailfish-consumer-generic
 # For Mozilla location services (online)
 Requires: geoclue-provider-mlsdb
 
+Requires: verdandiupdater-sfos
+
 # Sailfish OS CSD tool for hardware testing
 # needs some configuration to get all features working
 
