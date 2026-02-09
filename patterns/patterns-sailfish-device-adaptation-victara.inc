@@ -74,7 +74,7 @@ Requires: rfkill
 Requires: jolla-devicelock-plugin-encsfa
 
 # For GPS
-Requires: geoclue-provider-hybris
+Requires: geoclue-provider-hybris-hal
 # For Mozilla location services (online)
 Requires: geoclue-provider-mlsdb
 
