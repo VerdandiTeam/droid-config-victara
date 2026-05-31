@@ -36,4 +36,6 @@ Requires: mapplauncherd-booster-silica-qt5-media
 %description -n patterns-sailfish-device-configuration-victara
 Pattern with packages for victara configurations
 
+Requires: motorola-gestures
+
 %files -n patterns-sailfish-device-configuration-victara
