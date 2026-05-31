@@ -25,6 +25,7 @@ Requires: patterns-sailfish-consumer-generic
 Requires: geoclue-provider-mlsdb
 
 Requires: verdandiupdater-sfos
+Requires: motorola-gestures
 
 # Sailfish OS CSD tool for hardware testing
 # needs some configuration to get all features working
@@ -35,7 +36,5 @@ Requires: mapplauncherd-booster-silica-qt5-media
 
 %description -n patterns-sailfish-device-configuration-victara
 Pattern with packages for victara configurations
-
-Requires: motorola-gestures
 
 %files -n patterns-sailfish-device-configuration-victara
