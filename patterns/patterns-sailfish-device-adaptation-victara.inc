@@ -85,6 +85,9 @@ Requires: jolla-settings-system-flashlight
 #Requires: qt5-qtmultimedia-plugin-mediaservice-irisradio
 #Requires: jolla-mediaplayer-radio
 
+# wifi suspend
+Requires: sailfish-connman-plugin-suspend
+
 %description -n patterns-sailfish-device-adaptation-victara
 Pattern with packages for victara HW Adaptation
 
