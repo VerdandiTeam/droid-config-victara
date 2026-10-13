@@ -10,7 +10,11 @@
 # Community HW adaptations need this
 %define community_adaptation 1
 
+%define disable_tools 1
+
 %define additional_post_scripts ssu ur
+
+%define native_build 1
 
 Provides: ofono-configs
 Obsoletes: ofono-configs-mer

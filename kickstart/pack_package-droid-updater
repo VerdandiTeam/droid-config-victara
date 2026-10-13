@@ -1,0 +1,18 @@
+pushd $IMG_OUT_DIR
+
+DEVICE=@DEVICE@
+
+VERSION_FILE=./os-release
+source $VERSION_FILE
+
+# Locate rootfs tar.bz2 archive.
+for filename in *.tar.bz2; do
+    GEN_IMG_BASE=$(basename $filename .tar.bz2)
+done
+
+if [ ! -e "$GEN_IMG_BASE.tar.bz2" ]; then
+    echo "No rootfs archive found, exiting ..."
+    exit 1
+fi
+
+popd # $IMG_OUT_DIR
