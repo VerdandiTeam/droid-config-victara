@@ -1,0 +1,16 @@
+#!/bin/sh
+
+IFACE="$1"
+NV=/persist/WCNSS_qcom_wlan_factory_nv.bin
+
+MAC=$(od -An -tx1 -j6 -N6 "$NV" | tr -s ' \n' ':' | sed 's/^://; s/:$//')
+
+[ ${#MAC} -eq 17 ] || exit 1
+
+if ip link show "$IFACE" | grep -q '[<,]UP[,>]'; then
+    ip link set "$IFACE" down
+    ip link set "$IFACE" address "$MAC"
+    ip link set "$IFACE" up
+else
+    ip link set "$IFACE" address "$MAC"
+fi

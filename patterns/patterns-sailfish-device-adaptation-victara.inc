@@ -19,6 +19,7 @@ Requires: qt5-plugin-platform-eglfs
 
 # Vibra
 Requires: libngf-qt5-qtfeedback
+Requires: qt5-feedback-haptics-ffmemless
 
 # Needed for /dev/touchscreen symlink
 Requires: qt5-plugin-generic-evdev

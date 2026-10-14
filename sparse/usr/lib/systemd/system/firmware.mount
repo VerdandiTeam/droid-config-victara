@@ -1,0 +1,20 @@
+[Unit]
+Description=Droid mount for /firmware
+Before=local-fs.target systemd-modules-load.service
+
+[Mount]
+What=/dev/mmcblk0p1
+Where=/firmware
+Type=ext4
+Options=ro,nosuid,nodev,barrier=0
+# Options had SELinux context option:  context=u:object_r:firmware_file:s0
+
+# Default is 90 which makes mount period too long in case of
+# errors so drop it down a notch.
+TimeoutSec=10
+
+[Install]
+WantedBy=local-fs.target
+
+# From ./out/target/product/victara/root/fstab.qcom :
+# /dev/mmcblk0p1          /firmware    ext4    ro,nosuid,nodev,barrier=0,context=u:object_r:firmware_file:s0  wait,notrim
