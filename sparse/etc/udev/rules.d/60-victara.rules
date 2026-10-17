@@ -1,0 +1,5 @@
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="green:charging", RUN+="/bin/chgrp input /sys%p/brightness /sys%p/trigger", RUN+="/bin/chmod 0664 /sys%p/brightness /sys%p/trigger"
+ACTION=="add", SUBSYSTEM=="power_supply", KERNEL=="smbb-usbin", ATTR{charge_control_limit}="1500000"
+ACTION=="add", SUBSYSTEM=="ieee80211", RUN+="/usr/sbin/iw phy %k wowlan enable any"
+SUBSYSTEM=="power_supply", KERNEL=="smbb-usbin", ATTR{online}=="1", RUN+="/bin/sh -c 'echo usb > /sys/power/wake_lock'"
+SUBSYSTEM=="power_supply", KERNEL=="smbb-usbin", ATTR{online}=="0", RUN+="/bin/sh -c 'echo usb > /sys/power/wake_unlock'"

@@ -1,1 +1,0 @@
-ACTION=="add", SUBSYSTEM=="leds", KERNEL=="green:charging", RUN+="/bin/chgrp input /sys%p/brightness /sys%p/trigger", RUN+="/bin/chmod 0664 /sys%p/brightness /sys%p/trigger"
