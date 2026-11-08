@@ -1,18 +1,45 @@
 pushd $IMG_OUT_DIR
 
-DEVICE=@DEVICE@
+DEVICE=miami
 
 VERSION_FILE=./os-release
 source $VERSION_FILE
 
-# Locate rootfs tar.bz2 archive.
-for filename in *.tar.bz2; do
-    GEN_IMG_BASE=$(basename $filename .tar.bz2)
+# Locate rootfs tar archive.
+for filename in *.tar; do
+    GEN_IMG_BASE=$(basename $filename .tar)
 done
 
-if [ ! -e "$GEN_IMG_BASE.tar.bz2" ]; then
+echo $(ls)
+
+DST_IMG_BASE=$ID-$DEVICE-$SAILFISH_FLAVOUR-$VERSION_ID@EXTRA_NAME@
+
+if [ ! -e "$GEN_IMG_BASE.tar" ]; then
     echo "No rootfs archive found, exiting ..."
     exit 1
 fi
+
+IMG_SIZE=$(du -h $GEN_IMG_BASE.tar | cut -f1)
+
+# Output filenames
+DST_IMG_BASE=$ID-$DEVICE-$SAILFISH_FLAVOUR-$VERSION_ID@EXTRA_NAME@
+
+fallocate -l 26604339200 userdata.img
+
+/sbin/mkfs.ext4 userdata.img
+
+mkdir tmp
+
+mount userdata.img tmp
+
+mkdir -p tmp/.stowaways/sailfishos-mainline
+
+tar --numeric-owner -xf $GEN_IMG_BASE.tar -C tmp/.stowaways/sailfishos-mainline
+
+rm $GEN_IMG_BASE.tar
+
+umount userdata.img
+
+rmdir tmp
 
 popd # $IMG_OUT_DIR
