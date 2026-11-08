@@ -55,7 +55,7 @@ Requires: rfkill
 Requires: jolla-devicelock-plugin-encsfa
 
 # Flashlight
-Requires: jolla-settings-system-flashlight
+#Requires: jolla-settings-system-flashlight
 
 # For GPS
 Requires: gpsd
