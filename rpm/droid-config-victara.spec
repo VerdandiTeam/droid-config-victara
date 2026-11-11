@@ -8,7 +8,7 @@
 %define device_pretty Moto X 2014
 
 # Community HW adaptations need this
-# %define communit####y_adaptation 1
+%define community_adaptation 1
 
 %define disable_tools 1
 
@@ -19,7 +19,7 @@
 Provides: ofono-configs
 Obsoletes: ofono-configs-mer
 
-%define ofono_enable_plugins bluez5,hfp_ag_bluez5
+%define ofono_enable_plugins bluez5,hfp_ag_bluez5,qmimodem,udevng
 
 %define ofono_disable_plugins bluez4,dun_gw_bluez4,hfp_ag_bluez4,hfp_bluez4,dun_gw_bluez5,hfp_bluez5
 
