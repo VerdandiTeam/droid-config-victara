@@ -1,0 +1,127 @@
+pushd $IMG_OUT_DIR
+MD5SUMFILE=md5.lst
+DEVICE_VERSION_FILE=./hw-release
+if [ -n "@EXTRA_NAME@" ] && [ "@EXTRA_NAME@" != @"EXTRA_NAME"@ ]; then
+  EXTRA_NAME="@EXTRA_NAME@-"
+fi
+if [[ -a $DEVICE_VERSION_FILE ]]; then
+  source $DEVICE_VERSION_FILE
+  DEVICE_ID=-${MER_HA_DEVICE// /_}-$VERSION_ID
+fi
+source ./os-release
+if [ "$SSU_RELEASE_TYPE" = "rnd" ]; then
+  RND_FLAVOUR=$SAILFISH_FLAVOUR
+fi
+RELEASENAME=${NAME// /_}-${SAILFISH_CUSTOMER// /_}${SAILFISH_CUSTOMER:+-}${EXTRA_NAME// /_}$RND_FLAVOUR${RND_FLAVOUR:+-}$VERSION_ID$DEVICE_ID
+
+SYSTEM_SECTORS=5668864
+CACHE_SECTORS=2789520
+CUSTOMIZE_SECTORS=204800
+
+IMGSECTORS=0
+IMGBLOCKS=0
+IMGSIZE=0
+BLOCKSIZE=0
+
+resizeloop() {
+  local IMG=$1
+  local LOOP=$(/sbin/losetup -f)
+  /sbin/losetup $LOOP $IMG
+  /sbin/e2fsck -f -y $LOOP
+
+  local BLOCKCOUNT=$(/sbin/dumpe2fs -h $LOOP 2>&1 | grep "Block count:" | grep -o -E '[0-9]+')
+  local FREEBLOCKS=$(/sbin/dumpe2fs -h $LOOP 2>&1 | grep "Free blocks:" | grep -o -E '[0-9]+')
+  BLOCKSIZE=$(/sbin/dumpe2fs -h $LOOP 2>&1 | grep "Block size:" | grep -o -E '[0-9]+')
+  echo "$IMG total block count: $BLOCKCOUNT - Free blocks: $FREEBLOCKS"
+  local IMAGEBLOCKS=$(/usr/bin/expr $BLOCKCOUNT - $FREEBLOCKS)
+  local IMAGESECTORS=$(/usr/bin/expr $IMAGEBLOCKS \* $BLOCKSIZE / 512 )
+
+  echo "Shrink $IMG to $IMAGESECTORS"
+  /sbin/resize2fs $LOOP ${IMAGESECTORS}s -f
+
+  IMGBLOCKS=$(/sbin/dumpe2fs -h $LOOP 2>&1 | grep "Block count:" | grep -o -E '[0-9]+')
+  IMGSIZE=$(/usr/bin/expr $IMGBLOCKS \* $BLOCKSIZE)
+  IMGSECTORS=$(/usr/bin/expr $IMGBLOCKS \* $BLOCKSIZE / 512)
+  echo "$IMG resized block count: $IMGBLOCKS - Block size: $BLOCKSIZE - Sectors: $IMGSECTORS - Total size: $IMGSIZE"
+  /sbin/losetup -d $LOOP
+}
+
+echo "Resize root and home"
+resizeloop root.img
+ROOTSIZE=$IMGSIZE
+ROOTBLOCKS=$IMGBLOCKS
+ROOTSECTORS=$IMGSECTORS
+
+resizeloop home.img
+HOMESIZE=$IMGSIZE
+HOMEBLOCKS=$IMGBLOCKS
+HOMESECTORS=$IMGSECTORS
+
+mkdir rootmnt
+mount -o ro,loop root.img rootmnt
+dd if=/dev/zero bs=512 count=0 of=customize.img seek=$CUSTOMIZE_SECTORS
+/sbin/mkfs.ext2 -F -L sfboot -d rootmnt/boot customize.img
+umount rootmnt
+rmdir rootmnt
+
+USERDATA_SECTORS=$(/usr/bin/expr $ROOTSECTORS + $HOMESECTORS + 200000 )
+dd if=/dev/zero bs=512 count=0 of=userdata.img seek=$USERDATA_SECTORS
+dd if=/dev/zero bs=512 count=0 of=system.img seek=$SYSTEM_SECTORS
+dd if=/dev/zero bs=512 count=0 of=cache.img seek=$CACHE_SECTORS
+
+DATA_LOOP=$(/sbin/losetup -f --show userdata.img)
+SYSTEM_LOOP=$(/sbin/losetup -f --show system.img)
+CACHE_LOOP=$(/sbin/losetup -f --show cache.img)
+
+/usr/sbin/pvcreate $DATA_LOOP $SYSTEM_LOOP $CACHE_LOOP
+/usr/sbin/vgcreate sailfish $DATA_LOOP $SYSTEM_LOOP $CACHE_LOOP
+
+echo "Create logical volume ROOT size: $ROOTSIZE"
+/usr/sbin/lvcreate -L ${ROOTSIZE}B --name root sailfish $DATA_LOOP
+echo "Create logical volume HOME size: $HOMESIZE"
+/usr/sbin/lvcreate -L ${HOMESIZE}B --name home sailfish $DATA_LOOP
+
+/bin/sync
+/usr/sbin/vgchange -a y sailfish
+dd if=root.img bs=$BLOCKSIZE count=$ROOTBLOCKS of=/dev/sailfish/root
+dd if=home.img bs=$BLOCKSIZE count=$HOMEBLOCKS of=/dev/sailfish/home
+/bin/sync
+/usr/sbin/vgchange -a n sailfish
+
+/sbin/losetup -d $DATA_LOOP
+/sbin/losetup -d $SYSTEM_LOOP
+/sbin/losetup -d $CACHE_LOOP
+rm home.img root.img
+
+for PART in userdata system cache customize; do
+  /usr/bin/img2simg $PART.img sailfish-$PART.img
+  rm $PART.img
+done
+
+cat > flash-victara.sh <<'EOF_FLASH'
+#!/bin/bash
+set -e
+cd "$(dirname "$0")"
+
+fastboot flash boot lk2nd.img
+fastboot flash logo logo.bin
+fastboot flash customize sailfish-customize.img
+fastboot flash system sailfish-system.img
+fastboot flash cache sailfish-cache.img
+fastboot flash userdata sailfish-userdata.img
+EOF_FLASH
+chmod 755 flash-victara.sh
+
+FILES="*.img* logo.bin *-release flash-victara.sh"
+
+mkdir -p ${RELEASENAME}
+mv ${FILES} ${RELEASENAME}/
+
+cd ${RELEASENAME}
+md5sum * > $MD5SUMFILE
+cd ..
+
+zip -r ${RELEASENAME}.zip $RELEASENAME
+
+rm -r ${RELEASENAME}
+popd

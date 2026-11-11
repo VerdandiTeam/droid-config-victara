@@ -1,0 +1,9 @@
+[Unit]
+Description=Set %i Bluetooth address from NV
+RequiresMountsFor=/persist /var/lib/bluetooth
+BindsTo=sys-subsystem-bluetooth-devices-%i.device
+After=sys-subsystem-bluetooth-devices-%i.device
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/victara-bt-addr %i

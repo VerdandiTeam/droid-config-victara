@@ -8,7 +8,7 @@
 %define device_pretty Moto X 2014
 
 # Community HW adaptations need this
-%define community_adaptation 1
+# %define communit####y_adaptation 1
 
 %define disable_tools 1
 

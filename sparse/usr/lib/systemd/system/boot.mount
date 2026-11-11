@@ -1,0 +1,12 @@
+[Unit]
+Description=lk2nd extlinux boot partition
+Before=local-fs.target
+
+[Mount]
+What=/dev/mmcblk0p36
+Where=/boot
+Type=ext2
+Options=nosuid,nodev,noatime
+
+[Install]
+WantedBy=local-fs.target

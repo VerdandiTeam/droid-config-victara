@@ -1,12 +1,17 @@
 %package -n patterns-sailfish-device-adaptation-victara
 Summary: Jolla HW Adaptation victara
-Requires: kernel-adaptation-victara
+Requires: droid-hal-victara-img-boot
+Requires: droid-hal-victara-extlinux
+Requires: droid-firmware-victara
+Requires: rmtfs
+Requires: qrtr
 Requires: droid-config-victara-sailfish
 Requires: droid-config-victara-pulseaudio-settings
 Requires: droid-config-victara-policy-settings
 Requires: droid-config-victara-preinit-plugin
 Requires: droid-config-victara-flashing
 Requires: droid-config-victara-bluez5
+Requires: bluez5-tools
 Requires: droid-hal-version-victara
 
 # Graphics (mesa)
@@ -53,6 +58,8 @@ Requires: rfkill
 
 # enable device lock and allow to select untrusted software
 Requires: jolla-devicelock-plugin-encsfa
+
+Requires: sailfish-device-encryption
 
 # Flashlight
 #Requires: jolla-settings-system-flashlight

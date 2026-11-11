@@ -1,0 +1,23 @@
+#!/bin/sh
+
+HCI="$1"
+INDEX="${HCI#hci}"
+NV=/persist/.bt_nv.bin
+
+ADDR=$(od -An -tx1 -j3 -N6 "$NV" | awk '{ for (i = NF; i > 1; i--) printf "%s:", toupper($i); print toupper($1) }')
+
+[ ${#ADDR} -eq 17 ] || exit 1
+
+echo "$ADDR" > /var/lib/bluetooth/board-address
+
+INFO=$(btmgmt --index "$INDEX" info)
+
+echo "$INFO" | grep -q "addr $ADDR " && exit 0
+
+if echo "$INFO" | grep -q 'current settings:.* powered'; then
+    btmgmt --index "$INDEX" power off
+    btmgmt --index "$INDEX" public-addr "$ADDR"
+    btmgmt --index "$INDEX" power on
+else
+    btmgmt --index "$INDEX" public-addr "$ADDR"
+fi
